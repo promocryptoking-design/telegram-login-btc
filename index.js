@@ -4,13 +4,13 @@ import fetch from "node-fetch";
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const GROUP_ID = process.env.GROUP_ID;
-const PORT = process.env.PORT || 8080;
 
-/* --------- UTILIDAD: VALIDAR FIRMA TELEGRAM --------- */
-function isValidTelegramAuth(data) {
+// ---------- UTILIDAD: VALIDAR LOGIN TELEGRAM ----------
+function checkTelegramAuth(data) {
   const secret = crypto
     .createHash("sha256")
     .update(BOT_TOKEN)
@@ -22,49 +22,56 @@ function isValidTelegramAuth(data) {
     .map(k => `${k}=${data[k]}`)
     .join("\n");
 
-  const hash = crypto
+  const hmac = crypto
     .createHmac("sha256", secret)
     .update(checkString)
     .digest("hex");
 
-  return hash === data.hash;
+  return hmac === data.hash;
 }
 
-/* --------- HEALTH CHECK --------- */
+// ---------- LOGIN ----------
+app.post("/auth", async (req, res) => {
+  const data = req.body;
+
+  if (!checkTelegramAuth(data)) {
+    return res.status(401).json({ error: "Auth inválido" });
+  }
+
+  const userId = data.id;
+
+  // Verificar si está en el grupo
+  const tg = await fetch(
+    `https://api.telegram.org/bot${BOT_TOKEN}/getChatMember?chat_id=${GROUP_ID}&user_id=${userId}`
+  );
+  const json = await tg.json();
+
+  if (!json.ok) {
+    return res.status(403).json({ error: "No pertenece al grupo" });
+  }
+
+  const status = json.result.status;
+  const allowed = ["member", "administrator", "creator"];
+
+  if (!allowed.includes(status)) {
+    return res.status(403).json({ error: "No autorizado" });
+  }
+
+  // OK → redirige a calculadora
+  res.redirect("/app");
+});
+
+// ---------- APP ----------
+app.get("/app", (req, res) => {
+  res.sendFile(process.cwd() + "/public/app.html");
+});
+
+// ---------- TEST ----------
 app.get("/", (req, res) => {
   res.send("Telegram Login BTC Backend OK");
 });
 
-/* --------- LOGIN TELEGRAM --------- */
-app.post("/auth/telegram", async (req, res) => {
-  const user = req.body;
-
-  // 1️⃣ Validar firma
-  if (!isValidTelegramAuth(user)) {
-    return res.json({ ok: false, error: "Firma inválida" });
-  }
-
-  // 2️⃣ Verificar grupo
-  const url = `https://api.telegram.org/bot${BOT_TOKEN}/getChatMember?chat_id=${GROUP_ID}&user_id=${user.id}`;
-
-  try {
-    const tgRes = await fetch(url);
-    const tgData = await tgRes.json();
-
-    if (
-      tgData.ok &&
-      ["member", "administrator", "creator"].includes(tgData.result.status)
-    ) {
-      return res.json({ ok: true });
-    } else {
-      return res.json({ ok: false });
-    }
-  } catch (e) {
-    return res.json({ ok: false, error: "Telegram error" });
-  }
-});
-
-app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
+app.listen(8080, () => {
+  console.log("Server running on port 8080");
 });
 
