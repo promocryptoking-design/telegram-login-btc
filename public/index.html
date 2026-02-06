@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>La Matemática del Trading · BTC DCA</title>
+
+<script async src="https://telegram.org/js/telegram-widget.js?22"
+        data-telegram-login="AlertasTradingVip_bot"
+        data-size="large"
+        data-userpic="false"
+        data-radius="12"
+        data-request-access="write"
+        data-auth-url="/auth">
+</script>
+
+<style>
+body{
+  margin:0;
+  background:#020a13;
+  color:#eaf6ff;
+  font-family:Inter,Arial;
+}
+header{
+  padding:22px;
+  text-align:center;
+  border-bottom:1px solid rgba(0,229,255,.25);
+}
+h1{color:#00e5ff}
+.card{
+  max-width:1100px;
+  margin:30px auto;
+  padding:26px;
+  border-radius:18px;
+  border:1px solid rgba(0,229,255,.25);
+  background:#071826;
+}
+.hidden{display:none}
+button{
+  margin-top:14px;
+  padding:12px;
+  border:none;
+  border-radius:14px;
+  background:#00e5ff;
+  font-weight:900;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>LA MATEMÁTICA DEL TRADING</h1>
+  <p>BTC DCA Futures · Acceso exclusivo comunidad</p>
+</header>
+
+<div class="card" id="loginBox">
+  <h2>ACCESO EXCLUSIVO COMUNIDAD</h2>
+  <p>Inicia sesión con Telegram para continuar</p>
+</div>
+
+<div class="card hidden" id="app">
+  <h2>Calculadora BTC DCA</h2>
+  <p>✅ Acceso concedido</p>
+  <!-- AQUÍ luego pegaremos tu calculadora completa -->
+</div>
+
+<script>
+fetch("/me").then(r=>{
+  if(r.ok){
+    document.getElementById("loginBox").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+  }
+});
+</script>
+
+</body>
+</html>
