@@ -5,12 +5,12 @@
 <title>La Matemática del Trading · BTC DCA</title>
 
 <script async src="https://telegram.org/js/telegram-widget.js?22"
-        data-telegram-login="AlertasTradingVip_bot"
-        data-size="large"
-        data-userpic="false"
-        data-radius="12"
-        data-request-access="write"
-        data-auth-url="/auth">
+  data-telegram-login="AlertasTradingVip_bot"
+  data-size="large"
+  data-userpic="false"
+  data-radius="12"
+  data-request-access="write"
+  data-auth-url="/auth">
 </script>
 
 <style>
@@ -18,7 +18,7 @@ body{
   margin:0;
   background:#020a13;
   color:#eaf6ff;
-  font-family:Inter,Arial;
+  font-family:Arial,Inter;
 }
 header{
   padding:22px;
@@ -27,22 +27,15 @@ header{
 }
 h1{color:#00e5ff}
 .card{
-  max-width:1100px;
-  margin:30px auto;
-  padding:26px;
+  max-width:900px;
+  margin:40px auto;
+  padding:30px;
   border-radius:18px;
   border:1px solid rgba(0,229,255,.25);
   background:#071826;
+  text-align:center;
 }
 .hidden{display:none}
-button{
-  margin-top:14px;
-  padding:12px;
-  border:none;
-  border-radius:14px;
-  background:#00e5ff;
-  font-weight:900;
-}
 </style>
 </head>
 
@@ -53,21 +46,20 @@ button{
   <p>BTC DCA Futures · Acceso exclusivo comunidad</p>
 </header>
 
-<div class="card" id="loginBox">
+<div class="card" id="login">
   <h2>ACCESO EXCLUSIVO COMUNIDAD</h2>
   <p>Inicia sesión con Telegram para continuar</p>
 </div>
 
 <div class="card hidden" id="app">
-  <h2>Calculadora BTC DCA</h2>
-  <p>✅ Acceso concedido</p>
-  <!-- AQUÍ luego pegaremos tu calculadora completa -->
+  <h2>✅ Acceso concedido</h2>
+  <p>Aquí irá la calculadora completa</p>
 </div>
 
 <script>
 fetch("/me").then(r=>{
   if(r.ok){
-    document.getElementById("loginBox").classList.add("hidden");
+    document.getElementById("login").classList.add("hidden");
     document.getElementById("app").classList.remove("hidden");
   }
 });
