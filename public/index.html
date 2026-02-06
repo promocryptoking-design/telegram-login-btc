@@ -1,64 +1,60 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>La Matemática del Trading · BTC DCA</title>
+  <meta charset="UTF-8">
+  <title>La Matemática del Trading · Acceso</title>
 
-<script async src="https://telegram.org/js/telegram-widget.js?22"
-        data-telegram-login="AlertasTradingVip_bot"
-        data-size="large"
-        data-userpic="false"
-        data-radius="10"
-        data-auth-url="/auth"
-        data-request-access="write">
-</script>
+  <style>
+    body{
+      margin:0;
+      background:radial-gradient(circle at top,#041726,#020a13 60%);
+      color:#eaf6ff;
+      font-family:Arial, sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+    }
 
-<style>
-body{
-  margin:0;
-  background:#020a13;
-  color:#eaf6ff;
-  font-family:Inter,Arial;
-  text-align:center;
-}
+    .card{
+      background:linear-gradient(180deg,#081f30,#061523);
+      border-radius:18px;
+      padding:40px;
+      border:1px solid rgba(0,229,255,.25);
+      box-shadow:0 0 18px rgba(0,229,255,.35);
+      text-align:center;
+      width:420px;
+    }
 
-.card{
-  max-width:900px;
-  margin:80px auto;
-  padding:40px;
-  border-radius:20px;
-  background:#071826;
-  box-shadow:0 0 25px rgba(0,229,255,.35);
-}
+    h1{
+      color:#00e5ff;
+      font-size:20px;
+      margin-bottom:10px;
+      letter-spacing:1px;
+    }
 
-.hidden{display:none}
-button{padding:12px 18px;border-radius:12px}
-</style>
+    p{
+      color:#7fa6c0;
+      font-size:14px;
+      margin-bottom:25px;
+    }
+  </style>
 </head>
 
 <body>
 
-<div id="login" class="card">
-  <h2>ACCESO EXCLUSIVO COMUNIDAD</h2>
-  <p>Inicia sesión con Telegram para continuar</p>
-</div>
+  <div class="card">
+    <h1>ACCESO EXCLUSIVO COMUNIDAD</h1>
+    <p>Inicia sesión con Telegram para continuar</p>
 
-<div id="app" class="hidden">
-<!-- ⬇️⬇️⬇️ AQUÍ VA TU CALCULADORA COMPLETA ⬇️⬇️⬇️ -->
-
-<!-- PEGA EXACTAMENTE EL CÓDIGO DE LA CALCULADORA
-     QUE ME ENVIASTE ANTES
-     SIN CAMBIAR NADA -->
-
-</div>
-
-<script>
-const params = new URLSearchParams(window.location.search);
-if (params.get("access") === "granted") {
-  document.getElementById("login").style.display = "none";
-  document.getElementById("app").classList.remove("hidden");
-}
-</script>
+    <!-- 🔵 BOTÓN REAL DE TELEGRAM -->
+    <script async src="https://telegram.org/js/telegram-widget.js?22"
+      data-telegram-login="AlertasTradingVip_bot"
+      data-size="large"
+      data-auth-url="https://telegram-login-btc-production.up.railway.app/auth/telegram"
+      data-request-access="write">
+    </script>
+  </div>
 
 </body>
 </html>
