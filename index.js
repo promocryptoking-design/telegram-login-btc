@@ -1,17 +1,15 @@
 import express from "express";
 import crypto from "crypto";
-import fetch from "node-fetch";
-import fs from "fs";
 import path from "path";
+import fetch from "node-fetch";
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const GROUP_ID = process.env.GROUP_ID;
-
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
 
 function checkTelegramAuth(data) {
   const secret = crypto
@@ -33,58 +31,27 @@ function checkTelegramAuth(data) {
   return hmac === data.hash;
 }
 
-async function isUserInGroup(userId) {
-  const url = `https://api.telegram.org/bot${BOT_TOKEN}/getChatMember?chat_id=${GROUP_ID}&user_id=${userId}`;
-  const res = await fetch(url);
-  const json = await res.json();
-
-  if (!json.ok) return false;
-
-  return ["member", "administrator", "creator"].includes(json.result.status);
-}
-
-app.get("/", (req, res) => {
-  res.send(`
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Acceso comunidad</title>
-<script src="https://telegram.org/js/telegram-widget.js?22"
-        data-telegram-login="AlertasTradingVip_bot"
-        data-size="large"
-        data-userpic="false"
-        data-lang="es"
-        data-request-access="write"
-        data-auth-url="/auth">
-</script>
-</head>
-<body style="background:#020a13;color:#fff;text-align:center;margin-top:120px">
-<h2>AccESO EXCLUSIVO COMUNIDAD</h2>
-<p>Inicia sesión con Telegram para continuar</p>
-</body>
-</html>
-  `);
-});
-
-app.get("/auth", async (req, res) => {
-  const data = req.query;
+app.post("/auth", async (req, res) => {
+  const data = req.body;
 
   if (!checkTelegramAuth(data)) {
-    return res.send("❌ Autenticación inválida");
+    return res.status(403).send("Auth inválido");
   }
 
   const userId = data.id;
-  const allowed = await isUserInGroup(userId);
 
-  if (!allowed) {
-    return res.send("❌ No perteneces a la comunidad privada");
+  const tg = await fetch(
+    `https://api.telegram.org/bot${BOT_TOKEN}/getChatMember?chat_id=${GROUP_ID}&user_id=${userId}`
+  ).then(r => r.json());
+
+  if (!tg.ok || ["left", "kicked"].includes(tg.result.status)) {
+    return res.status(403).send("No estás en el grupo");
   }
 
-  const html = fs.readFileSync(path.join(process.cwd(), "app.html"), "utf8");
-  res.send(html);
+  res.redirect("/?access=granted");
 });
 
-app.listen(PORT, () => {
-  console.log("🚀 Server running on port", PORT);
-});
+app.listen(process.env.PORT || 8080, () =>
+  console.log("Servidor listo")
+);
+
