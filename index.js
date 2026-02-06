@@ -1,57 +1,94 @@
 import express from "express";
 import crypto from "crypto";
 import path from "path";
-import fetch from "node-fetch";
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const PORT = process.env.PORT || 8080;
+
+// 🔐 TOKEN DEL BOT
+const BOT_TOKEN = process.env.BOT_TOKEN || "PEGA_AQUI_EL_TOKEN_DE_AlertasTradingVip_bot";
+
+// 📁 Servir HTML
 app.use(express.static("public"));
 
-const BOT_TOKEN = process.env.BOT_TOKEN;
-const GROUP_ID = process.env.GROUP_ID;
-
+// 🧠 Verificación oficial Telegram
 function checkTelegramAuth(data) {
-  const secret = crypto
+  const { hash, ...rest } = data;
+
+  const dataCheckString = Object.keys(rest)
+    .sort()
+    .map(key => `${key}=${rest[key]}`)
+    .join("\n");
+
+  const secretKey = crypto
     .createHash("sha256")
     .update(BOT_TOKEN)
     .digest();
 
-  const checkString = Object.keys(data)
-    .filter(k => k !== "hash")
-    .sort()
-    .map(k => `${k}=${data[k]}`)
-    .join("\n");
-
   const hmac = crypto
-    .createHmac("sha256", secret)
-    .update(checkString)
+    .createHmac("sha256", secretKey)
+    .update(dataCheckString)
     .digest("hex");
 
-  return hmac === data.hash;
+  return hmac === hash;
 }
 
-app.post("/auth", async (req, res) => {
-  const data = req.body;
+// ✅ RUTA QUE FALTABA (ESTE ERA EL ERROR)
+app.get("/auth/telegram", (req, res) => {
+  const data = req.query;
 
-  if (!checkTelegramAuth(data)) {
-    return res.status(403).send("Auth inválido");
+  if (!data || !data.hash) {
+    return res.status(400).send("❌ Datos inválidos");
   }
 
-  const userId = data.id;
+  const isValid = checkTelegramAuth(data);
 
-  const tg = await fetch(
-    `https://api.telegram.org/bot${BOT_TOKEN}/getChatMember?chat_id=${GROUP_ID}&user_id=${userId}`
-  ).then(r => r.json());
-
-  if (!tg.ok || ["left", "kicked"].includes(tg.result.status)) {
-    return res.status(403).send("No estás en el grupo");
+  if (!isValid) {
+    return res.status(403).send("❌ Autenticación Telegram inválida");
   }
 
-  res.redirect("/?access=granted");
+  // ✅ ACCESO CONCEDIDO
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <title>Acceso concedido</title>
+      <style>
+        body{
+          background:#020a13;
+          color:#00ff9c;
+          font-family:Arial;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          height:100vh;
+        }
+        .box{
+          border:1px solid #00ff9c;
+          padding:30px;
+          border-radius:12px;
+          text-align:center;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="box">
+        <h2>✅ Acceso concedido</h2>
+        <p>Bienvenido <b>${data.first_name}</b></p>
+        <p>@${data.username || "sin_username"}</p>
+      </div>
+    </body>
+    </html>
+  `);
 });
 
-app.listen(process.env.PORT || 8080, () =>
-  console.log("Servidor listo")
-);
+// 🔁 Fallback
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve("public/index.html"));
+});
 
+// 🚀 Start
+app.listen(PORT, () => {
+  console.log("🚀 Server running on port", PORT);
+});
