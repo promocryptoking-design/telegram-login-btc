@@ -52,7 +52,7 @@ app.get("/auth/telegram", (req, res) => {
 
   // ✅ LOGIN OK → REDIRIGIR A CALCULADORA
   res.redirect(
-    `https://dcabtcrypto.promocryptoking.workers.dev/?user=${username}`
+    `https://dcabitcoin.promocryptoking.workers.dev/?user=${username}`
   );
 });
 
