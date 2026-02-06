@@ -1,65 +1,68 @@
 import express from "express";
 import crypto from "crypto";
 import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-const BOT_TOKEN = process.env.BOT_TOKEN;
 const PORT = process.env.PORT || 8080;
 
-// Servir HTML
-app.use(express.static("public"));
+// 🔐 TOKEN DEL BOT
+const BOT_TOKEN = process.env.BOT_TOKEN || "PEGA_AQUI_EL_TOKEN_DEL_BOT";
 
-/* =========================
-   VERIFICAR TELEGRAM LOGIN
-========================= */
-function verifyTelegram(data) {
-  const secret = crypto
+// Para __dirname en ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Servir frontend
+app.use(express.static(path.join(__dirname, "public")));
+
+/* ===========================
+   VALIDACIÓN TELEGRAM
+=========================== */
+function checkTelegramAuth(data) {
+  const { hash, ...rest } = data;
+
+  const dataCheckString = Object.keys(rest)
+    .sort()
+    .map(key => `${key}=${rest[key]}`)
+    .join("\n");
+
+  const secretKey = crypto
     .createHash("sha256")
     .update(BOT_TOKEN)
     .digest();
 
-  const checkString = Object.keys(data)
-    .filter(k => k !== "hash")
-    .sort()
-    .map(k => `${k}=${data[k]}`)
-    .join("\n");
-
-  const hash = crypto
-    .createHmac("sha256", secret)
-    .update(checkString)
+  const hmac = crypto
+    .createHmac("sha256", secretKey)
+    .update(dataCheckString)
     .digest("hex");
 
-  return hash === data.hash;
+  return hmac === hash;
 }
 
-/* =========================
-   LOGIN TELEGRAM (POST)
-========================= */
-app.post("/auth/telegram", (req, res) => {
-  const data = req.body;
-
-  if (!verifyTelegram(data)) {
-    return res.status(403).send("❌ Login inválido");
+/* ===========================
+   RUTA TELEGRAM LOGIN (GET)
+=========================== */
+app.get("/auth/telegram", (req, res) => {
+  if (!checkTelegramAuth(req.query)) {
+    return res.redirect("/?error=telegram_invalid");
   }
 
-  // ✅ LOGIN OK
-  console.log("Usuario autenticado:", data.username);
+  const username = req.query.username || "usuario";
 
-  // 👉 Redirige a la calculadora REAL
-  res.redirect("/app.html");
+  // ✅ LOGIN OK → REDIRIGIR A CALCULADORA
+  res.redirect(
+    `https://dcabtcrypto.promocryptoking.workers.dev/?user=${username}`
+  );
 });
 
-/* =========================
-   TEST
-========================= */
+/* ===========================
+   ROOT
+=========================== */
 app.get("/", (req, res) => {
-  res.send("Telegram Login BTC Backend OK");
+  res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
 app.listen(PORT, () => {
-  console.log("Servidor corriendo en puerto", PORT);
+  console.log("✅ Telegram Login BTC Backend activo en puerto", PORT);
 });
-
