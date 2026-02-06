@@ -1,81 +1,65 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>La Matemática del Trading · Acceso Comunidad</title>
+<meta charset="UTF-8">
+<title>La Matemática del Trading · BTC DCA</title>
 
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: radial-gradient(circle at top, #041726, #020a13 70%);
-      font-family: Arial, Helvetica, sans-serif;
-      color: #eaf6ff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+<script async src="https://telegram.org/js/telegram-widget.js?22"
+        data-telegram-login="AlertasTradingVip_bot"
+        data-size="large"
+        data-userpic="false"
+        data-radius="10"
+        data-auth-url="/auth"
+        data-request-access="write">
+</script>
 
-    header {
-      width: 100%;
-      padding: 30px 0;
-      text-align: center;
-      border-bottom: 1px solid rgba(0,229,255,.25);
-    }
+<style>
+body{
+  margin:0;
+  background:#020a13;
+  color:#eaf6ff;
+  font-family:Inter,Arial;
+  text-align:center;
+}
 
-    h1 {
-      margin: 0;
-      color: #00e5ff;
-      letter-spacing: 2px;
-    }
+.card{
+  max-width:900px;
+  margin:80px auto;
+  padding:40px;
+  border-radius:20px;
+  background:#071826;
+  box-shadow:0 0 25px rgba(0,229,255,.35);
+}
 
-    .box {
-      margin-top: 80px;
-      padding: 40px;
-      background: linear-gradient(180deg, #081f30, #061523);
-      border-radius: 18px;
-      border: 1px solid rgba(0,229,255,.35);
-      box-shadow: 0 0 25px rgba(0,229,255,.35);
-      text-align: center;
-      max-width: 420px;
-    }
-
-    .box h2 {
-      margin-top: 0;
-      color: #00e5ff;
-      letter-spacing: 1px;
-    }
-
-    .sub {
-      font-size: 14px;
-      opacity: 0.8;
-      margin-bottom: 25px;
-    }
-  </style>
+.hidden{display:none}
+button{padding:12px 18px;border-radius:12px}
+</style>
 </head>
 
 <body>
 
-<header>
-  <h1>LA MATEMÁTICA DEL TRADING</h1>
-  <p>BTC DCA Futures · Acceso exclusivo comunidad</p>
-</header>
-
-<div class="box">
+<div id="login" class="card">
   <h2>ACCESO EXCLUSIVO COMUNIDAD</h2>
-  <p class="sub">Inicia sesión con Telegram para continuar</p>
-
-  <!-- TELEGRAM LOGIN WIDGET (CORRECTO) -->
-  <script
-    async
-    src="https://telegram.org/js/telegram-widget.js?22"
-    data-telegram-login="AlertasTradingVip_bot"
-    data-size="large"
-    data-userpic="false"
-    data-request-access="write"
-    data-auth-url="https://telegram-login-btc-production.up.railway.app/auth/telegram">
-  </script>
+  <p>Inicia sesión con Telegram para continuar</p>
 </div>
+
+<div id="app" class="hidden">
+<!-- ⬇️⬇️⬇️ AQUÍ VA TU CALCULADORA COMPLETA ⬇️⬇️⬇️ -->
+
+<!-- PEGA EXACTAMENTE EL CÓDIGO DE LA CALCULADORA
+     QUE ME ENVIASTE ANTES
+     SIN CAMBIAR NADA -->
+
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+if (params.get("access") === "granted") {
+  document.getElementById("login").style.display = "none";
+  document.getElementById("app").classList.remove("hidden");
+}
+</script>
 
 </body>
 </html>
+
