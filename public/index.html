@@ -4,38 +4,34 @@
 <meta charset="UTF-8">
 <title>La Matemática del Trading · BTC DCA</title>
 
-<script async src="https://telegram.org/js/telegram-widget.js?22"
-  data-telegram-login="AlertasTradingVip_bot"
-  data-size="large"
-  data-userpic="false"
-  data-radius="12"
-  data-request-access="write"
-  data-auth-url="/auth">
-</script>
-
 <style>
 body{
   margin:0;
   background:#020a13;
   color:#eaf6ff;
-  font-family:Arial,Inter;
+  font-family:Arial,Helvetica,sans-serif;
 }
 header{
-  padding:22px;
-  text-align:center;
-  border-bottom:1px solid rgba(0,229,255,.25);
-}
-h1{color:#00e5ff}
-.card{
-  max-width:900px;
-  margin:40px auto;
   padding:30px;
-  border-radius:18px;
-  border:1px solid rgba(0,229,255,.25);
+  text-align:center;
+  border-bottom:1px solid #00e5ff55;
+}
+h1{color:#00e5ff;margin:0}
+.container{
+  max-width:600px;
+  margin:80px auto;
+  padding:20px;
+}
+.card{
   background:#071826;
+  border-radius:16px;
+  padding:30px;
+  border:1px solid #00e5ff55;
   text-align:center;
 }
 .hidden{display:none}
+.success{color:#00ff9c;font-weight:bold}
+.error{color:#ff4d4d;font-weight:bold}
 </style>
 </head>
 
@@ -46,24 +42,44 @@ h1{color:#00e5ff}
   <p>BTC DCA Futures · Acceso exclusivo comunidad</p>
 </header>
 
-<div class="card" id="login">
-  <h2>ACCESO EXCLUSIVO COMUNIDAD</h2>
-  <p>Inicia sesión con Telegram para continuar</p>
-</div>
+<div class="container">
 
-<div class="card hidden" id="app">
-  <h2>✅ Acceso concedido</h2>
-  <p>Aquí irá la calculadora completa</p>
+  <!-- LOGIN -->
+  <div class="card" id="loginBox">
+    <h2>ACCESO EXCLUSIVO COMUNIDAD</h2>
+    <p>Inicia sesión con Telegram para continuar</p>
+
+    <!-- BOTÓN OFICIAL TELEGRAM -->
+    <script async
+      src="https://telegram.org/js/telegram-widget.js?22"
+      data-telegram-login="AlertasTradingVip_bot"
+      data-size="large"
+      data-radius="12"
+      data-auth-url="https://telegram-login-btc-production.up.railway.app/auth"
+      data-request-access="write">
+    </script>
+
+    <p id="loginError" class="error"></p>
+  </div>
+
+  <!-- ACCESO OK -->
+  <div class="card hidden" id="okBox">
+    <h2>Calculadora BTC DCA</h2>
+    <p class="success">✅ Acceso concedido</p>
+    <p>Puedes usar la herramienta</p>
+  </div>
+
 </div>
 
 <script>
-fetch("/me").then(r=>{
-  if(r.ok){
-    document.getElementById("login").classList.add("hidden");
-    document.getElementById("app").classList.remove("hidden");
-  }
-});
+/* Si Telegram ya autenticó, Railway redirige aquí con ?ok=1 */
+const params = new URLSearchParams(window.location.search);
+if(params.get("ok")==="1"){
+  document.getElementById("loginBox").classList.add("hidden");
+  document.getElementById("okBox").classList.remove("hidden");
+}
 </script>
 
 </body>
 </html>
+
