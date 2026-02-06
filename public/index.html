@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Acceso exclusivo comunidad</title>
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:radial-gradient(circle at top,#041726,#020a13 60%);
+  color:#eaf6ff;
+  font-family:Inter,Arial;
+}
+.card{
+  background:#071826;
+  border-radius:18px;
+  padding:40px;
+  text-align:center;
+  border:1px solid rgba(0,229,255,.25);
+  box-shadow:0 0 20px rgba(0,229,255,.35);
+}
+h1{
+  margin:0 0 10px;
+  color:#00e5ff;
+  letter-spacing:1px;
+}
+p{
+  font-size:14px;
+  color:#7fa6c0;
+  margin-bottom:20px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="card">
+  <h1>ACCESO EXCLUSIVO COMUNIDAD</h1>
+  <p>Inicia sesión con Telegram para continuar</p>
+
+  <!-- BOTÓN TELEGRAM -->
+  <script
+    async
+    src="https://telegram.org/js/telegram-widget.js?22"
+    data-telegram-login="AlertasTradingVip_bot"
+    data-size="large"
+    data-userpic="false"
+    data-radius="10"
+    data-auth-url="/auth/telegram"
+    data-request-access="write">
+  </script>
+</div>
+
+</body>
+</html>
