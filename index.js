@@ -1,23 +1,26 @@
 import express from "express";
 import crypto from "crypto";
 import fetch from "node-fetch";
+import path from "path";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const GROUP_ID = process.env.GROUP_ID;
 
-// ---------- UTILIDAD: VALIDAR LOGIN TELEGRAM ----------
 function checkTelegramAuth(data) {
+  const hash = data.hash;
+  delete data.hash;
+
   const secret = crypto
     .createHash("sha256")
     .update(BOT_TOKEN)
     .digest();
 
   const checkString = Object.keys(data)
-    .filter(k => k !== "hash")
     .sort()
     .map(k => `${k}=${data[k]}`)
     .join("\n");
@@ -27,51 +30,31 @@ function checkTelegramAuth(data) {
     .update(checkString)
     .digest("hex");
 
-  return hmac === data.hash;
+  return hmac === hash;
 }
 
-// ---------- LOGIN ----------
 app.post("/auth", async (req, res) => {
-  const data = req.body;
-
-  if (!checkTelegramAuth(data)) {
-    return res.status(401).json({ error: "Auth inválido" });
+  if (!checkTelegramAuth({ ...req.body })) {
+    return res.status(403).send("Auth failed");
   }
 
-  const userId = data.id;
+  const userId = req.body.id;
 
-  // Verificar si está en el grupo
-  const tg = await fetch(
+  const tgRes = await fetch(
     `https://api.telegram.org/bot${BOT_TOKEN}/getChatMember?chat_id=${GROUP_ID}&user_id=${userId}`
   );
-  const json = await tg.json();
+  const tgData = await tgRes.json();
 
-  if (!json.ok) {
-    return res.status(403).json({ error: "No pertenece al grupo" });
+  if (!["member","administrator","creator"].includes(tgData.result?.status)) {
+    return res.status(403).send("No eres miembro del grupo");
   }
 
-  const status = json.result.status;
-  const allowed = ["member", "administrator", "creator"];
-
-  if (!allowed.includes(status)) {
-    return res.status(403).json({ error: "No autorizado" });
-  }
-
-  // OK → redirige a calculadora
-  res.redirect("/app");
+  res.redirect("/");
 });
 
-// ---------- APP ----------
-app.get("/app", (req, res) => {
-  res.sendFile(process.cwd() + "/public/app.html");
+app.get("/me", (req, res) => {
+  res.sendStatus(200);
 });
 
-// ---------- TEST ----------
-app.get("/", (req, res) => {
-  res.send("Telegram Login BTC Backend OK");
-});
-
-app.listen(8080, () => {
-  console.log("Server running on port 8080");
-});
-
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log("Servidor listo"));
